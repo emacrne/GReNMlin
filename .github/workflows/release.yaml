@@ -26,10 +26,10 @@ jobs:
 
       - name: Build GUI
         run: |
-          pyinstaller --onefile gui2.py
+          pyinstaller --onefile gui.py
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/gui2.exe
+          files: dist/gui.exe
           tag_name: ${{ inputs.tag_name }}
