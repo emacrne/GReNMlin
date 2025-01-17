@@ -3,7 +3,9 @@ name: Release GUI to GitHub Releases
 on:
   pull_request:
   workflow_dispatch:
-
+  push:
+    tags:
+      - "v*.*.*"
 jobs:
   build:
     runs-on: windows-latest
