@@ -3,9 +3,10 @@ name: Release GUI to GitHub Releases
 on:
   pull_request:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*.*.*"
+    inputs:
+      tag_name:
+        description: "Tag name for the release"
+        required: true
 jobs:
   build:
     runs-on: windows-latest
@@ -32,3 +33,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/gui2.exe
+          tag_name: "Test"
