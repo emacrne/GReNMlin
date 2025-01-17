@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout
                            QListWidget, QGroupBox, QTabWidget, QGridLayout, 
                            QTextEdit, QMessageBox, QStyleFactory, QMenu, QAction, 
                            QScrollArea, QFileDialog, QSplitter)
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QIcon
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -93,12 +93,12 @@ class NetworkDesignerGUI(QMainWindow):
                 font-size: 10pt;
             }
             QGroupBox {
-                font-size: 11pt;
+                font-size: 10pt;
                 font-weight: bold;
                 border: 1px solid #404040;
-                border-radius: 3px;
-                margin-top: 0.5em;
-                padding: 0.5em;
+                border-radius: 2px;
+                margin-top: 0.3em;
+                padding: 0.1em;
                 background-color: #333333;
             }
             QGroupBox::title {
@@ -111,9 +111,9 @@ class NetworkDesignerGUI(QMainWindow):
                 color: white;
                 border: 1px solid #555555;
                 border-radius: 3px;
-                padding: 3px;
-                min-height: 30px;
-                font-size: 10pt;
+                padding: 2px;
+                min-height: 25px;
+                font-size: 9pt;
             }
             QPushButton:hover {
                 background-color: #4a4a4a;
@@ -139,6 +139,12 @@ class NetworkDesignerGUI(QMainWindow):
             }
             QPushButton[class="success"]:hover {
                 background-color: #388E3C;
+            }
+            QLineEdit, QComboBox {
+                padding: 1px;
+                min-height: 18px;
+                min-width: 80px;
+                max-width: 400px;
             }
             QLineEdit {
                 background-color: #404040;
@@ -179,12 +185,16 @@ class NetworkDesignerGUI(QMainWindow):
                 color: white;
                 border: 1px solid #555555;
                 border-radius: 3px;
+                min-width: 150px;
+                max-width: 600px;
             }
             QTextEdit {
                 background-color: #404040;
                 color: white;
                 border: 1px solid #555555;
                 border-radius: 3px;
+                min-width: 150px;
+                max-width: 600px;
             }
             QTabWidget::pane {
                 border: 1px solid #404040;
@@ -193,12 +203,9 @@ class NetworkDesignerGUI(QMainWindow):
             QTabBar::tab {
                 background-color: #2b2b2b;
                 color: #ffffff;
-                padding: 6px 10px;
-                border: 1px solid #404040;
-                border-bottom: none;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-                font-size: 10pt;
+                padding: 3px 6px;
+                min-width: 60px;
+                font-size: 9pt;
             }
             QTabBar::tab:selected {
                 background-color: #333333;
@@ -209,7 +216,10 @@ class NetworkDesignerGUI(QMainWindow):
             }
             QLabel {
                 color: #ffffff;
-                font-size: 10pt;
+                font-size: 9pt;
+                padding: 0px;
+                min-width: 60px;
+                max-width: 300px;
             }
             QStatusBar {
                 background-color: #333333;
@@ -222,7 +232,7 @@ class NetworkDesignerGUI(QMainWindow):
             QMainWindow {
                 background-color: #f0f0f0;
                 color: #000000;
-                font-size: 10pt;
+                font-size: 1pt;
             }
             QWidget {
                 background-color: #f0f0f0;
@@ -230,17 +240,19 @@ class NetworkDesignerGUI(QMainWindow):
                 font-size: 10pt;
             }
             QGroupBox {
-                font-size: 11pt;
+                font-size: 10pt;
                 font-weight: bold;
                 border: 1px solid #cccccc;
-                border-radius: 3px;
-                margin-top: 0.5em;
-                padding: 0.5em;
+                border-radius: 2px;
+                margin-top: 0.3em;
+                padding: 0.1em;
                 background-color: #ffffff;
+                min-width: 150px;
+                max-width: 600px;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
-                left: 10px;
+                left: 8px;
                 padding: 0 3px 0 3px;
             }
             QPushButton {
@@ -248,88 +260,61 @@ class NetworkDesignerGUI(QMainWindow):
                 color: black;
                 border: 1px solid #cccccc;
                 border-radius: 3px;
-                padding: 3px;
-                min-height: 30px;
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background-color: #d0d0d0;
-                border: 1px solid #bbbbbb;
-            }
-            QPushButton[class="primary"] {
-                background-color: #2196F3;
-                color: white;
-                border: 1px solid #1976D2;
-            }
-            QPushButton[class="primary"]:hover {
-                background-color: #1976D2;
-            }
-            QPushButton[class="danger"] {
-                background-color: #f44336;
-                color: white;
-                border: 1px solid #d32f2f;
-            }
-            QPushButton[class="danger"]:hover {
-                background-color: #d32f2f;
-            }
-            QPushButton[class="success"] {
-                background-color: #4CAF50;
-                color: white;
-                border: 1px solid #388E3C;
-            }
-            QPushButton[class="success"]:hover {
-                background-color: #388E3C;
-            }
-            QLineEdit {
-                background-color: white;
-                color: black;
-                border: 1px solid #cccccc;
-                border-radius: 3px;
-                padding: 3px;
-                min-height: 20px;
-                font-size: 10pt;
-            }
-            QLineEdit:focus {
-                border: 1px solid #2196F3;
-            }
-            QComboBox {
-                background-color: white;
-                color: black;
-                border: 1px solid #cccccc;
-                border-radius: 3px;
-                padding: 3px;
+                padding: 2px;
                 min-height: 25px;
-                font-size: 10pt;
+                font-size: 9pt;
             }
-            QListWidget, QTextEdit {
+            QLineEdit, QComboBox {
                 background-color: white;
                 color: black;
                 border: 1px solid #cccccc;
                 border-radius: 3px;
+                padding: 1px;
+                min-height: 18px;
+                min-width: 80px;
+                max-width: 400px;
+                font-size: 10pt;
+            }
+            QListWidget {
+                background-color: white;
+                color: black;
+                border: 1px solid #cccccc;
+                border-radius: 3px;
+                min-width: 150px;
+                max-width: 600px;
+            }
+            QTextEdit {
+                background-color: white;
+                color: black;
+                border: 1px solid #cccccc;
+                border-radius: 3px;
+                min-width: 150px;
+                max-width: 600px;
             }
             QTabWidget::pane {
                 border: 1px solid #cccccc;
-                background-color: white;
+                background-color: #ffffff;
             }
             QTabBar::tab {
                 background-color: #e0e0e0;
                 color: black;
-                padding: 8px 10px;
-                border: 1px solid #cccccc;
-                border-bottom: none;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-                font-size: 10pt;
+                padding: 3px 6px;
+                min-width: 60px;
+                font-size: 9pt;
             }
             QTabBar::tab:selected {
-                background-color: white;
+                background-color: #ffffff;
+                border-bottom: none;
             }
             QTabBar::tab:hover {
                 background-color: #d0d0d0;
             }
             QLabel {
                 color: black;
-                font-size: 10pt;
+                font-size: 9pt;
+                padding: 0px;
+                min-width: 60px;
+                max-width: 300px;
             }
             QStatusBar {
                 background-color: #f0f0f0;
@@ -346,26 +331,29 @@ class NetworkDesignerGUI(QMainWindow):
         main_container = QWidget()
         self.setCentralWidget(main_container)
         main_layout = QHBoxLayout(main_container)
-        main_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins for better splitter appearance
-        
-        # Create splitter
-        splitter = QSplitter(Qt.Horizontal)
+        main_layout.setContentsMargins(0, 0, 0, 0)
         
         # Create left panel with scroll
         left_scroll = QScrollArea()
         left_scroll.setWidgetResizable(True)
         left_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         left_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        left_scroll.setMinimumWidth(200)
+        
+        # Create splitter
+        splitter = QSplitter(Qt.Horizontal)
         
         # Create left panel with tabs
         left_panel = QWidget()
         left_layout = QVBoxLayout(left_panel)
-        left_layout.setContentsMargins(5, 5, 5, 5)
+        left_layout.setContentsMargins(2, 2, 2, 2)
+        left_layout.setSpacing(2)
         
-        # Create header with theme button and file menu
+        # Create header
         header = QHBoxLayout()
+        header.setSpacing(4)
         
-        # Create file menu button
+        # Create file menu
         file_menu = QMenu(self)
         load_action = QAction('Load Network', self)
         save_action = QAction('Save Network', self)
@@ -377,35 +365,36 @@ class NetworkDesignerGUI(QMainWindow):
         file_menu.addAction(save_action)
         
         file_button = QPushButton("File")
-        file_button.setFixedSize(50, 32)
+        file_button.setFixedHeight(25)
         file_button.clicked.connect(lambda: file_menu.exec_(file_button.mapToGlobal(file_button.rect().bottomLeft())))
+        self.theme_button.setFixedSize(25, 25)
         
         header.addWidget(file_button)
         header.addStretch()
-        header.addWidget(self.theme_button)
-        left_layout.addLayout(header)
+        header.addWidget(self.theme_button, 0, Qt.AlignRight)
         
-        # Create tab widget
+        # Create tabs
         self.tab_widget = QTabWidget()
         self.tab_widget.setDocumentMode(True)
+        self.tab_widget.setStyleSheet("QTabBar::tab { padding: 4px 8px; min-width: 80px; }")
         
-        # Create and add tabs
         self.species_tab = self.create_species_tab()
         self.genes_tab = self.create_genes_tab()
         self.simulation_tab = self.create_simulation_tab()
         self.steady_state_tab = self.create_steady_state_tab()
+        self.analysis_tab = self.create_analysis_tab()
         
         self.tab_widget.addTab(self.species_tab, "Species")
         self.tab_widget.addTab(self.genes_tab, "Genes")
         self.tab_widget.addTab(self.simulation_tab, "Simulation")
         self.tab_widget.addTab(self.steady_state_tab, "Steady State")
+        self.tab_widget.addTab(self.analysis_tab, "Analysis")
         
+        left_layout.addLayout(header)
         left_layout.addWidget(self.tab_widget)
-        
-        # Add left panel to scroll area
         left_scroll.setWidget(left_panel)
         
-        # Create right visualization panel with scroll area
+        # Create right panel
         viz_scroll = QScrollArea()
         viz_scroll.setWidgetResizable(True)
         viz_panel = self.create_visualization_panel()
@@ -415,10 +404,18 @@ class NetworkDesignerGUI(QMainWindow):
         splitter.addWidget(left_scroll)
         splitter.addWidget(viz_scroll)
         
-        # Set initial sizes (30% left, 70% right)
-        splitter.setSizes([300, 700])
+        # Now set splitter properties after adding widgets
+        splitter.setHandleWidth(5)
+        splitter.setCollapsible(0, False)
+        splitter.setSizes([int(self.width() * 0.3), int(self.width() * 0.7)])
         
-        # Add splitter to main layout
+        # Store splitter reference and setup resize handling
+        self.splitter = splitter
+        self.resize_timer = QTimer()
+        self.resize_timer.setSingleShot(True)
+        self.resize_timer.timeout.connect(self.update_splitter_sizes)
+        self.resizeEvent = self.on_resize
+        
         main_layout.addWidget(splitter)
         
         self.statusBar().showMessage("Ready")
@@ -444,6 +441,13 @@ class NetworkDesignerGUI(QMainWindow):
         """Create the species tab with input fields and lists"""
         tab = QWidget()
         layout = QVBoxLayout(tab)
+        layout.setContentsMargins(1, 1, 1, 1)
+        layout.setSpacing(1)
+        
+        # Make grid layouts more compact
+        input_layout = QGridLayout()
+        input_layout.setHorizontalSpacing(2)
+        input_layout.setVerticalSpacing(2)
         
         # Input species section
         input_group = QGroupBox("Add Input Species")
@@ -500,6 +504,8 @@ class NetworkDesignerGUI(QMainWindow):
     def create_genes_tab(self):
         tab = QWidget()
         layout = QVBoxLayout(tab)
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(2)
         
         # Properties group
         props_group = QGroupBox("Gene Properties")
@@ -661,6 +667,8 @@ class NetworkDesignerGUI(QMainWindow):
         """Create parent tab for steady state analysis"""
         tab = QWidget()
         layout = QVBoxLayout(tab)
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(2)
         
         # Create nested tab widget for steady state
         steady_state_tabs = QTabWidget()
@@ -685,7 +693,7 @@ class NetworkDesignerGUI(QMainWindow):
         input_layout = QVBoxLayout()
         self.steady_input_fields_widget = QWidget()
         self.steady_input_fields_layout = QGridLayout(self.steady_input_fields_widget)
-        self.update_steady_input_fields()  # New method to update input fields
+        self.update_steady_input_fields()
         input_layout.addWidget(self.steady_input_fields_widget)
         input_group.setLayout(input_layout)
         
@@ -711,6 +719,11 @@ class NetworkDesignerGUI(QMainWindow):
         run_btn.setProperty("class", "success")
         layout.addWidget(run_btn)
         
+        # Results text area
+        self.single_steady_results = QTextEdit()
+        self.single_steady_results.setReadOnly(True)
+        layout.addWidget(self.single_steady_results)
+        
         return tab
     
     def create_multiple_steady_tab(self):
@@ -724,6 +737,7 @@ class NetworkDesignerGUI(QMainWindow):
         
         self.multiple_steady_ins_factor = QLineEdit("1")
         self.multiple_steady_rep_num = QLineEdit("10")
+        self.multi_eps = QLineEdit("0.01")
         
         row = 0
         param_layout.addWidget(QLabel("Input Scale Factor:"), row, 0)
@@ -733,6 +747,10 @@ class NetworkDesignerGUI(QMainWindow):
         param_layout.addWidget(QLabel("Number of Repetitions:"), row, 0)
         param_layout.addWidget(self.multiple_steady_rep_num, row, 1)
         
+        row += 1
+        param_layout.addWidget(QLabel("Epsilon (Convergence Threshold):"), row, 0)
+        param_layout.addWidget(self.multi_eps, row, 1)
+        
         param_group.setLayout(param_layout)
         layout.addWidget(param_group)
         
@@ -741,6 +759,11 @@ class NetworkDesignerGUI(QMainWindow):
         run_btn.clicked.connect(self.run_steady_multiple)
         run_btn.setProperty("class", "success")
         layout.addWidget(run_btn)
+        
+        # Results text area
+        self.multiple_steady_results = QTextEdit()
+        self.multiple_steady_results.setReadOnly(True)
+        layout.addWidget(self.multiple_steady_results)
         
         return tab
     
@@ -776,61 +799,34 @@ class NetworkDesignerGUI(QMainWindow):
                 QMessageBox.warning(self, "Error", "No input species defined")
                 return
             
-            # Get input values and apply scale factor
+            # Get input values
             ins_factor = float(self.single_steady_ins_factor.text())
             IN = []
             for name in self.network.input_species_names:
-                value = float(self.steady_input_values[name].text()) * ins_factor
+                value = float(self.steady_input_values[name].text())
                 IN.append(value)
             
-            # Generate equations and model
+            # Generate model first
             self.network.generate_equations()
             self.network.generate_model()
-            
-            # Import the generated model directly
             import model
             importlib.reload(model)
             
-            # Create initial state with input values fixed
-            n_inputs = len(IN)
-            n_others = len(self.network.species_names) - n_inputs
-            initial_state = np.concatenate([IN, np.zeros(n_others)])
+            # Use simulator's get_steady function
+            df = simulator.get_steady(
+                grn=self.network,
+                model=model.solve_model,
+                rep_num=1,
+                INS_def=IN,
+                INS_factor=ins_factor,
+                eps=0.01
+            )
             
-            # Run simulation using solve_model directly
-            steady_state = model.solve_model_steady(initial_state)
+            # Display results
+            result_text = "Steady State Results:\n\n"
+            result_text += df.to_string()
+            self.single_steady_results.setText(result_text)
             
-            # For input species, use the original input values
-            steady_state[:n_inputs] = IN
-            
-            # Plot steady state results
-            self.sim_canvas.figure.clear()
-            fig = self.sim_canvas.figure
-            
-            # Create two subplots
-            ax1 = fig.add_subplot(211)  # Bar plot
-            ax2 = fig.add_subplot(212)  # Text results
-            
-            # Bar plot
-            ax1.bar(self.network.species_names, steady_state)
-            ax1.set_ylabel('Concentration')
-            ax1.set_title('Steady State Results')
-            plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
-            
-            # Text results
-            results_text = "Steady State Values:\n\n"
-            for i, name in enumerate(self.network.species_names):
-                results_text += f"{name}: {steady_state[i]:.3f}\n"
-            
-            ax2.text(0.1, 0.5, results_text, 
-                    transform=ax2.transAxes, 
-                    verticalalignment='center',
-                    fontfamily='monospace')
-            ax2.axis('off')
-            
-            fig.tight_layout()
-            self.sim_canvas.draw()
-            
-            # Update status bar
             self.statusBar().showMessage("Steady state calculation completed", 3000)
             
         except Exception as e:
@@ -839,34 +835,47 @@ class NetworkDesignerGUI(QMainWindow):
     def run_steady_multiple(self):
         """Run multiple steady state simulations"""
         try:
+            if not hasattr(self, 'network'):
+                QMessageBox.warning(self, "Error", "No network defined")
+                return
+            
+            if not self.network.input_species_names:
+                QMessageBox.warning(self, "Error", "No input species defined")
+                return
+            
             # Get parameters
+            ins_factor = float(self.multiple_steady_ins_factor.text())
+            n_reps = int(self.multiple_steady_rep_num.text())
             eps = float(self.multi_eps.text())
-            ins_factor = float(self.multi_ins_factor.text())
-            rep_num = int(self.multi_rep_num.text())
             
-            # Get custom input combinations if provided
-            ins_def = None
-            if self.multi_input_text.toPlainText().strip():
-                ins_def = eval(self.multi_input_text.toPlainText())
+            # Get input values
+            IN = []
+            for name in self.network.input_species_names:
+                value = float(self.steady_input_values[name].text())
+                IN.append(value)
             
-            # Find steady states
+            # Generate model first
+            self.network.generate_equations()
+            self.network.generate_model()
+            import model
+            importlib.reload(model)
+            
+            # Use simulator's get_steady function
             df = simulator.get_steady(
-                self.network,
-                rep_num=rep_num,
-                INS_def=ins_def,
+                grn=self.network,
+                model=model.solve_model,
+                rep_num=n_reps,
+                INS_def=IN,
                 INS_factor=ins_factor,
                 eps=eps
             )
             
-            # Save results to CSV
-            filename = "steady_states.csv"
-            df.to_csv(filename)
+            # Display results
+            result_text = f"Found {len(df)} steady states:\n\n"
+            result_text += df.to_string()
+            self.multiple_steady_results.setText(result_text)
             
-            # Show results
-            msg = QMessageBox()
-            msg.setWindowTitle("Steady States Results")
-            msg.setText(f"Found {len(df)} steady states.\nResults saved to {filename}\n\nFirst few steady states:\n\n{df.head().to_string()}")
-            msg.exec_()
+            self.statusBar().showMessage("Multiple steady states computation completed", 3000)
             
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Steady states computation failed: {str(e)}")
@@ -1137,6 +1146,7 @@ class NetworkDesignerGUI(QMainWindow):
     
     def run_single_simulation(self):
         try:
+            # Original structural validation
             if not self.network.input_species_names:
                 raise ValueError("No input species defined. Please add input species first.")
             
@@ -1154,6 +1164,10 @@ class NetworkDesignerGUI(QMainWindow):
             if not self.network.genes:
                 raise ValueError("No genes defined. Please add genes first.")
             
+            # Additional parameter validation
+            if not self.validate_parameters():
+                return
+            
             t_end = float(self.sim_time.text())
             ins_factor = float(self.single_ins_factor.text())
             
@@ -1170,7 +1184,9 @@ class NetworkDesignerGUI(QMainWindow):
             )
             
             self.plot_simulation_results(T, Y)
+            self.last_simulation_results = (T, Y)
             self.statusBar().showMessage("Simulation completed", 3000)
+            
         except ValueError as e:
             QMessageBox.warning(self, "Error", f"Invalid input: {str(e)}")
         except Exception as e:
@@ -1552,6 +1568,7 @@ class NetworkDesignerGUI(QMainWindow):
                 self.update_species_combobox()
                 self.update_network_view()
                 self.update_genes_list()
+                self.update_steady_input_fields()
                 
                 # Replace simulation tab
                 for i in range(self.tab_widget.count()):
@@ -1574,6 +1591,127 @@ class NetworkDesignerGUI(QMainWindow):
                 f"Gene: α={gene['alpha']}, Logic={gene['logic_type']}, "
                 f"Regulators=[{regulators_str}]"
             )
+
+    def create_analysis_tab(self):
+        """Create analysis tab for simulation results"""
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        
+        # Group for input-output analysis
+        io_group = QGroupBox("Input-Output Analysis")
+        io_layout = QVBoxLayout()
+        
+        # Button to analyze input-output relationships
+        analyze_btn = QPushButton("Analyze Network Response")
+        analyze_btn.clicked.connect(self.analyze_network_response)
+        
+        # Results display
+        self.response_text = QTextEdit()
+        self.response_text.setReadOnly(True)
+        
+        io_layout.addWidget(analyze_btn)
+        io_layout.addWidget(self.response_text)
+        io_group.setLayout(io_layout)
+        layout.addWidget(io_group)
+        
+        return tab
+
+    def analyze_network_response(self):
+        """Analyze how network responds to different input combinations"""
+        if not hasattr(self, 'last_simulation_results'):
+            QMessageBox.warning(self, "Error", "No simulation results available. Run a simulation first.")
+            return
+        
+        T, Y = self.last_simulation_results
+        
+        # Calculate response characteristics
+        result = "Network Response Analysis:\n\n"
+        
+        # Find input and output species
+        input_species = self.network.input_species_names
+        output_species = [s['name'] for s in self.network.species 
+                         if s['name'] not in input_species]
+        
+        result += f"Input species: {', '.join(input_species)}\n"
+        result += f"Output species: {', '.join(output_species)}\n\n"
+        
+        # Analyze each output
+        for out_name in output_species:
+            out_idx = next(i for i, s in enumerate(self.network.species) 
+                          if s['name'] == out_name)
+            
+            result += f"Output {out_name}:\n"
+            result += f"  Final value: {Y[-1, out_idx]:.2f}\n"
+            result += f"  Maximum: {max(Y[:, out_idx]):.2f}\n"
+            result += f"  Minimum: {min(Y[:, out_idx]):.2f}\n"
+            
+            # Check if steady state reached
+            threshold = 0.01
+            is_steady = True
+            # Use last 10% of points or at least 10 points for steady state check
+            check_points = max(min(len(Y) // 10, 100), 10)
+            start_idx = max(0, len(Y) - check_points)
+            
+            for i in range(start_idx, len(Y)):
+                if abs(Y[i, out_idx] - Y[-1, out_idx]) > threshold:
+                    is_steady = False
+                    break
+            
+            result += f"  Steady state: {'Yes' if is_steady else 'No'}\n\n"
+        
+        self.response_text.setText(result)
+
+    def validate_parameters(self):
+        """Validate simulation parameters"""
+        try:
+            # Validate simulation time
+            try:
+                t_end = float(self.sim_time.text())
+                if t_end <= 0:
+                    raise ValueError("Simulation time must be positive")
+                if t_end > 1000:  # Reasonable upper limit
+                    raise ValueError("Simulation time too large (max 1000)")
+            except ValueError:
+                raise ValueError("Invalid simulation time value")
+            
+            # Validate insulation factor
+            try:
+                ins_factor = float(self.single_ins_factor.text())
+                if ins_factor < 0:
+                    raise ValueError("Insulation factor must be non-negative")
+                if ins_factor > 1:
+                    raise ValueError("Insulation factor must be <= 1")
+            except ValueError:
+                raise ValueError("Invalid insulation factor value")
+            
+            # Validate input values
+            for species in self.network.input_species_names:
+                if species in self.input_values:
+                    try:
+                        value = float(self.input_values[species].text())
+                        if value < 0:
+                            raise ValueError(f"Input value for {species} must be non-negative")
+                        if value > 100:  # Based on examples
+                            raise ValueError(f"Input value for {species} too large (max 100)")
+                    except ValueError:
+                        raise ValueError(f"Invalid input value for {species}")
+            
+            return True
+            
+        except ValueError as e:
+            QMessageBox.warning(self, "Invalid Parameters", str(e))
+            return False
+
+    def on_resize(self, event):
+        """Handle window resize event"""
+        super().resizeEvent(event)
+        self.resize_timer.start(100)  # Delay update to avoid too frequent resizing
+
+    def update_splitter_sizes(self):
+        """Update splitter sizes after window resize"""
+        if hasattr(self, 'splitter'):
+            total = self.splitter.width()
+            self.splitter.setSizes([int(total * 0.3), int(total * 0.7)])
 
 if __name__ == "__main__":
     app = QApplication([])
