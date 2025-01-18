@@ -19,6 +19,7 @@ class NetworkDesignerGUI(QMainWindow):
     def __init__(self):
         super().__init__()
         self.input_values = {}
+        self.steady_input_values = {}  # Initialize here
         self.current_theme = "dark"  # Default theme
         self.network = grn.grn()  # Initialize network first
         
@@ -664,221 +665,122 @@ class NetworkDesignerGUI(QMainWindow):
         return tab
     
     def create_steady_state_tab(self):
-        """Create parent tab for steady state analysis"""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
-        layout.setContentsMargins(2, 2, 2, 2)
-        layout.setSpacing(2)
-        
-        # Create nested tab widget for steady state
-        steady_state_tabs = QTabWidget()
-        
-        # Create and add sub-tabs
-        single_steady_tab = self.create_single_steady_tab()
-        multiple_steady_tab = self.create_multiple_steady_tab()
-        
-        steady_state_tabs.addTab(single_steady_tab, "Single Steady State")
-        steady_state_tabs.addTab(multiple_steady_tab, "Multiple Steady States")
-        
-        layout.addWidget(steady_state_tabs)
-        return tab
-    
-    def create_single_steady_tab(self):
-        """Create tab for single steady state analysis"""
+        """Create steady state analysis tab"""
         tab = QWidget()
         layout = QVBoxLayout(tab)
         
-        # Input values section
+        controls_group = QGroupBox("Controls")
+        controls_layout = QVBoxLayout()
+        
         input_group = QGroupBox("Input Species Values")
-        input_layout = QVBoxLayout()
-        self.steady_input_fields_widget = QWidget()
-        self.steady_input_fields_layout = QGridLayout(self.steady_input_fields_widget)
+        self.steady_input_fields_layout = QGridLayout()
+        input_group.setLayout(self.steady_input_fields_layout)
+        controls_layout.addWidget(input_group)
+        
+        params_group = QGroupBox("Analysis Parameters")
+        params_layout = QGridLayout()
+        
+        scale_label = QLabel("Input Scale Factor:")
+        self.single_ins_factor = QLineEdit("1")
+        params_layout.addWidget(scale_label, 0, 0)
+        params_layout.addWidget(self.single_ins_factor, 0, 1)
+        
+        eps_label = QLabel("Convergence Threshold:")
+        self.eps_input = QLineEdit("0.001")
+        params_layout.addWidget(eps_label, 1, 0)
+        params_layout.addWidget(self.eps_input, 1, 1)
+        
+        params_group.setLayout(params_layout)
+        controls_layout.addWidget(params_group)
+        
+        find_steady_btn = QPushButton("Find Steady State")
+        find_steady_btn.clicked.connect(self.run_steady_single)
+        find_steady_btn.setProperty("class", "success")
+        controls_layout.addWidget(find_steady_btn)
+        
+        controls_group.setLayout(controls_layout)
+        
+        splitter = QSplitter(Qt.Vertical)
+        
+        controls_widget = QWidget()
+        controls_widget.setLayout(controls_layout)
+        splitter.addWidget(controls_widget)
+        
+        results_group = QGroupBox("Results")
+        results_layout = QVBoxLayout()
+        
+        self.steady_fig = plt.figure()
+        self.steady_canvas = FigureCanvas(self.steady_fig)
+        results_layout.addWidget(self.steady_canvas)
+        
+        self.steady_results = QTextEdit()
+        self.steady_results.setReadOnly(True)
+        results_layout.addWidget(self.steady_results)
+        
+        results_group.setLayout(results_layout)
+        splitter.addWidget(results_group)
+        
+        layout.addWidget(splitter)
+        
         self.update_steady_input_fields()
-        input_layout.addWidget(self.steady_input_fields_widget)
-        input_group.setLayout(input_layout)
-        
-        # Parameters
-        param_group = QGroupBox("Analysis Parameters")
-        param_layout = QGridLayout()
-        
-        self.single_steady_ins_factor = QLineEdit("1")
-        
-        row = 0
-        param_layout.addWidget(QLabel("Input Scale Factor:"), row, 0)
-        param_layout.addWidget(self.single_steady_ins_factor, row, 1)
-        
-        param_group.setLayout(param_layout)
-        
-        # Add groups to layout
-        layout.addWidget(input_group)
-        layout.addWidget(param_group)
-        
-        # Run button
-        run_btn = QPushButton("Find Steady State")
-        run_btn.clicked.connect(self.run_steady_single)
-        run_btn.setProperty("class", "success")
-        layout.addWidget(run_btn)
-        
-        # Results text area
-        self.single_steady_results = QTextEdit()
-        self.single_steady_results.setReadOnly(True)
-        layout.addWidget(self.single_steady_results)
         
         return tab
-    
-    def create_multiple_steady_tab(self):
-        """Create tab for multiple steady state analysis"""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
-        
-        # Parameters
-        param_group = QGroupBox("Analysis Parameters")
-        param_layout = QGridLayout()
-        
-        self.multiple_steady_ins_factor = QLineEdit("1")
-        self.multiple_steady_rep_num = QLineEdit("10")
-        self.multi_eps = QLineEdit("0.01")
-        
-        row = 0
-        param_layout.addWidget(QLabel("Input Scale Factor:"), row, 0)
-        param_layout.addWidget(self.multiple_steady_ins_factor, row, 1)
-        
-        row += 1
-        param_layout.addWidget(QLabel("Number of Repetitions:"), row, 0)
-        param_layout.addWidget(self.multiple_steady_rep_num, row, 1)
-        
-        row += 1
-        param_layout.addWidget(QLabel("Epsilon (Convergence Threshold):"), row, 0)
-        param_layout.addWidget(self.multi_eps, row, 1)
-        
-        param_group.setLayout(param_layout)
-        layout.addWidget(param_group)
-        
-        # Run button
-        run_btn = QPushButton("Find Multiple Steady States")
-        run_btn.clicked.connect(self.run_steady_multiple)
-        run_btn.setProperty("class", "success")
-        layout.addWidget(run_btn)
-        
-        # Results text area
-        self.multiple_steady_results = QTextEdit()
-        self.multiple_steady_results.setReadOnly(True)
-        layout.addWidget(self.multiple_steady_results)
-        
-        return tab
-    
-    def update_steady_input_fields(self):
-        """Update input fields for steady state analysis based on current network"""
-        # Clear existing fields
-        while self.steady_input_fields_layout.count():
-            item = self.steady_input_fields_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
-        
-        # Add fields for each input species
-        if hasattr(self, 'network'):
-            if not self.network.input_species_names:
-                label = QLabel("No input species defined. Add input species in the Species tab.")
-                self.steady_input_fields_layout.addWidget(label, 0, 0, 1, 2)
-            else:
-                self.steady_input_values = {}  # Create new dict for steady state inputs
-                for i, name in enumerate(self.network.input_species_names):
-                    self.steady_input_fields_layout.addWidget(QLabel(f"{name}:"), i, 0)
-                    input_field = QLineEdit("0")
-                    self.steady_input_fields_layout.addWidget(input_field, i, 1)
-                    self.steady_input_values[name] = input_field
     
     def run_steady_single(self):
-        """Run single steady state simulation"""
+        """Run steady state analysis using get_steady_single"""
         try:
-            if not hasattr(self, 'network'):
-                QMessageBox.warning(self, "Error", "No network defined")
-                return
-            
-            if not self.network.input_species_names:
-                QMessageBox.warning(self, "Error", "No input species defined")
-                return
-            
-            # Get input values
-            ins_factor = float(self.single_steady_ins_factor.text())
-            IN = []
-            for name in self.network.input_species_names:
-                value = float(self.steady_input_values[name].text())
-                IN.append(value)
-            
-            # Generate model first
             self.network.generate_equations()
             self.network.generate_model()
-            import model
-            importlib.reload(model)
             
-            # Use simulator's get_steady function
-            df = simulator.get_steady(
+            input_values = []
+            for species in self.network.input_species_names:
+                if species in self.steady_input_values:
+                    value = float(self.steady_input_values[species].text())
+                    input_values.append(value)
+                else:
+                    input_values.append(0.0)
+            
+            ins_factor = float(self.single_ins_factor.text())
+            eps = float(self.eps_input.text())
+            
+            states = simulator.get_steady_single(
                 grn=self.network,
-                model=model.solve_model,
-                rep_num=1,
-                INS_def=IN,
+                IN=input_values,
                 INS_factor=ins_factor,
-                eps=0.01
-            )
-            
-            # Display results
-            result_text = "Steady State Results:\n\n"
-            result_text += df.to_string()
-            self.single_steady_results.setText(result_text)
-            
-            self.statusBar().showMessage("Steady state calculation completed", 3000)
-            
-        except Exception as e:
-            QMessageBox.warning(self, "Error", str(e))
-    
-    def run_steady_multiple(self):
-        """Run multiple steady state simulations"""
-        try:
-            if not hasattr(self, 'network'):
-                QMessageBox.warning(self, "Error", "No network defined")
-                return
-            
-            if not self.network.input_species_names:
-                QMessageBox.warning(self, "Error", "No input species defined")
-                return
-            
-            # Get parameters
-            ins_factor = float(self.multiple_steady_ins_factor.text())
-            n_reps = int(self.multiple_steady_rep_num.text())
-            eps = float(self.multi_eps.text())
-            
-            # Get input values
-            IN = []
-            for name in self.network.input_species_names:
-                value = float(self.steady_input_values[name].text())
-                IN.append(value)
-            
-            # Generate model first
-            self.network.generate_equations()
-            self.network.generate_model()
-            import model
-            importlib.reload(model)
-            
-            # Use simulator's get_steady function
-            df = simulator.get_steady(
-                grn=self.network,
-                model=model.solve_model,
-                rep_num=n_reps,
-                INS_def=IN,
-                INS_factor=ins_factor,
+                plot_on=False,
                 eps=eps
             )
             
-            # Display results
-            result_text = f"Found {len(df)} steady states:\n\n"
-            result_text += df.to_string()
-            self.multiple_steady_results.setText(result_text)
+            self.steady_fig.clear()
+            ax = self.steady_fig.add_subplot(111)
             
-            self.statusBar().showMessage("Multiple steady states computation completed", 3000)
+            states_array = np.array(states)
+            for i, species in enumerate(self.network.species_names):
+                ax.plot(states_array[:, i], label=species)
+            
+            ax.set_xlabel('Iteration')
+            ax.set_ylabel('Concentration')
+            ax.legend()
+            ax.grid(True)
+            self.steady_canvas.draw()
+            
+            result = "Steady State Analysis Results:\n\n"
+            final_state = states[-1]
+            
+            for i, species in enumerate(self.network.species_names):
+                result += f"{species}:\n"
+                result += f"  Initial Value: {states[0][i]:.4f}\n"
+                result += f"  Final Value: {final_state[i]:.4f}\n"
+                result += f"  Convergence Steps: {len(states)}\n"
+                result += f"  Min Value: {min(states_array[:, i]):.4f}\n"
+                result += f"  Max Value: {max(states_array[:, i]):.4f}\n\n"
+            
+            self.steady_results.setText(result)
             
         except Exception as e:
-            QMessageBox.warning(self, "Error", f"Steady states computation failed: {str(e)}")
+            import traceback
+            error_msg = traceback.format_exc()
+            QMessageBox.warning(self, "Error", f"Failed to run steady state analysis: {str(e)}")
     
     def update_input_fields(self):
         while self.input_fields_layout.count():
@@ -1712,6 +1614,26 @@ class NetworkDesignerGUI(QMainWindow):
         if hasattr(self, 'splitter'):
             total = self.splitter.width()
             self.splitter.setSizes([int(total * 0.3), int(total * 0.7)])
+
+    def update_steady_input_fields(self):
+        """Update input fields for steady state analysis based on current network"""
+        # Clear existing fields
+        while self.steady_input_fields_layout.count():
+            item = self.steady_input_fields_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        # Add fields for each input species
+        if hasattr(self, 'network'):
+            if not self.network.input_species_names:
+                label = QLabel("No input species defined. Add input species in the Species tab.")
+                self.steady_input_fields_layout.addWidget(label, 0, 0, 1, 2)
+            else:
+                for i, name in enumerate(self.network.input_species_names):
+                    self.steady_input_fields_layout.addWidget(QLabel(f"{name}:"), i, 0)
+                    input_field = QLineEdit("0")
+                    self.steady_input_fields_layout.addWidget(input_field, i, 1)
+                    self.steady_input_values[name] = input_field
 
 if __name__ == "__main__":
     app = QApplication([])
